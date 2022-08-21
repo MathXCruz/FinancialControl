@@ -11,4 +11,4 @@ def test_main_status_code():
 
 def test_main_response_json():
     response = client.get('/')
-    assert response.json() == {'Hello': 'World'}
+    assert response.json() == 'Welcome to the financial control app!'
