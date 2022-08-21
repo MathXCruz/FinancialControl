@@ -13,7 +13,10 @@ def root():
 
 
 @app.get('/transactions/')
-def list_transactions(month_year: Optional[str] = None, category: Optional[CategoryOptions] = None):
+def list_transactions(
+    month_year: Optional[str] = None,
+    category: Optional[CategoryOptions] = None,
+):
     return accounting.find_by_field(month_year, category)
 
 
@@ -23,11 +26,14 @@ def show_transaction(item_id: int):
 
 
 @app.get('/balance')
-def show_accounting(month_year: Optional[str] = None, category: Optional[CategoryOptions] = None):
+def show_accounting(
+    month_year: Optional[str] = None,
+    category: Optional[CategoryOptions] = None,
+):
     return accounting.calculate_balance(month_year, category)
 
 
-@app.delete('/')
+@app.delete('/', status_code=status.HTTP_204_NO_CONTENT)
 def remove_transaction(item_id: int):
     return accounting.delete_item(item_id)
 

@@ -10,6 +10,7 @@ class CategoryOptions(str, Enum):
     clothing = 'clothing'
     subscriptions = 'subscriptions'
     housing = 'housing'
+    gifts = 'gifts'
     others = 'others'
 
 
@@ -27,10 +28,19 @@ class Accounting:
         return operation
 
     def find_by_id(self, item_id: int) -> Item:
-        item = filter(lambda x: x['id'] == item_id, self.transactions)
-        return list(item)[0]
+        if not self.transactions:
+            raise HTTPException(status_code=404, detail='No transactions registered.')
+        else:
+            for transaction in self.transactions:
+                if transaction['id'] == item_id:
+                    item = filter(lambda x: x['id'] == item_id, self.transactions)
+                    return list(item)[0]
+                else:
+                    raise HTTPException(status_code=404, detail='Item not found')
 
-    def find_by_field(self, month_year: Optional[str], category: Optional[CategoryOptions]) -> List[Item]:
+    def find_by_field(
+        self, month_year: Optional[str], category: Optional[CategoryOptions]
+    ) -> List[Item]:
         filtered_transactions: List[Item] = []
         if month_year is not None:
             for transaction in self.transactions:
@@ -42,14 +52,19 @@ class Accounting:
                     filtered_transactions.append(transaction)
         elif month_year is not None and category is not None:
             for transaction in self.transactions:
-                if transaction['month_year'] == month_year and transaction['category'] == category:
+                if (
+                    transaction['month_year'] == month_year
+                    and transaction['category'] == category
+                ):
                     filtered_transactions.append(transaction)
         else:
             for transaction in self.transactions:
                 filtered_transactions.append(transaction)
         return filtered_transactions
 
-    def calculate_balance(self, month_year: Optional[str], category: Optional[CategoryOptions]) -> str:
+    def calculate_balance(
+        self, month_year: Optional[str], category: Optional[CategoryOptions]
+    ) -> str:
         total_balance: float = 0
         for transaction in self.find_by_field(month_year, category):
             if transaction['category'] == CategoryOptions.income:
@@ -59,8 +74,11 @@ class Accounting:
         return f'R${total_balance:.2f}'
 
     def delete_item(self, item_id: int):
-        for transaction in self.transactions:
-            if transaction['id'] == item_id:
-                return self.transactions.remove(self.transactions[item_id])
-            else:
-                raise HTTPException(status_code=404, detail="Item not found")
+        if not self.transactions:
+            raise HTTPException(status_code=404, detail='No transactions registered.')
+        else:
+            for transaction in self.transactions:
+                if transaction['id'] == item_id:
+                    return self.transactions.remove(self.transactions[item_id])
+                else:
+                    raise HTTPException(status_code=404, detail='Item not found')
