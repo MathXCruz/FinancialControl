@@ -35,8 +35,7 @@ class Accounting:
                 if transaction['id'] == item_id:
                     item = filter(lambda x: x['id'] == item_id, self.transactions)
                     return list(item)[0]
-                else:
-                    raise HTTPException(status_code=404, detail='Item not found')
+            raise HTTPException(status_code=404, detail='Item not found')
 
     def find_by_field(
         self, month_year: Optional[str], category: Optional[CategoryOptions]
@@ -80,5 +79,5 @@ class Accounting:
             for transaction in self.transactions:
                 if transaction['id'] == item_id:
                     return self.transactions.remove(self.transactions[item_id])
-                else:
-                    raise HTTPException(status_code=404, detail='Item not found')
+            else:
+                raise HTTPException(status_code=404, detail='Item not found')
